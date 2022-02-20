@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "baseUrl": "src",
+    "outDir": "./public/",
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "es6",
+      "es2016",
+      "es2017",
     ],
+    "noImplicitAny": true,
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,14 +19,20 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "es6",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "sourceMap": true,
+    "importHelpers": true,
+    "declaration": true,
+    "rootDir": "src",
+    "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true
   },
-  "include": [
-    "src"
+  "exclude": [
+    "node_modules"
   ]
 }
