@@ -1,6 +1,7 @@
 {
   "name": "google-maps-location-search-tailwind-react-ts-component",
   "version": "0.1.0",
+  "homepage": "https://maks1mp.github.io/GMLSTRTC",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.3",
