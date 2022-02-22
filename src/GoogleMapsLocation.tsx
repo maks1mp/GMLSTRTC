@@ -1,8 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import GooglePlacesAutocomplete, {geocodeByPlaceId, geocodeByLatLng} from 'react-google-places-autocomplete';
 import {GoogleMap, useJsApiLoader, Marker} from '@react-google-maps/api';
-import {AutocompletePrediction} from 'react-places-autocomplete';
+import PlacesAutocomplete, {AutocompletePrediction, geocodeByPlaceId} from 'react-places-autocomplete';
 
 interface AutocompletePredictionSelect {
   label: string;
@@ -21,6 +20,25 @@ const INITIAL_LOCATION: AutocompletePredictionSelect = {
     description: 'London, UK',
   }
 }
+
+const geocodeByLatLng = (latLng: MapLocation): Promise<any> => {
+  const geocoder = new window.google.maps.Geocoder();
+  const { OK } = window.google.maps.GeocoderStatus;
+
+  return new Promise((resolve, reject) => {
+    geocoder.geocode(
+      { location: latLng },
+      (
+        results,
+        status,
+      ) => {
+        if (status !== OK) return reject(status);
+
+        return resolve(results);
+      }
+    );
+  });
+};
 
 const getCachedGeo = (): MapLocation | null => {
   const geo = localStorage.getItem('geo')
@@ -53,6 +71,7 @@ export default function GoogleMapsLocation() {
     googleMapsApiKey
   })
 
+  const [search, setSearch] = useState<string>(() => getCachedAddress()?.label ?? '')
   const [map, setMap] = React.useState(null)
   const [address, setAddress] = useState<AutocompletePredictionSelect | null>(() => getCachedAddress())
   const [center, setCenter] = useState<MapLocation | null>(() => getCachedGeo());
@@ -67,6 +86,7 @@ export default function GoogleMapsLocation() {
 
   const setGeoFromPrediction = useCallback(async (prediction: AutocompletePredictionSelect) => {
     setAddress(prediction)
+    setSearch(prediction.label)
 
     const [geocode] = await geocodeByPlaceId(prediction!.value!.place_id!)
 
@@ -119,14 +139,57 @@ export default function GoogleMapsLocation() {
     <div className="h-screen w-screen relative">
       <div className="fixed left-0 right-0 top-0 h-12 z-10 p-0.5">
         {map && (
-          <GooglePlacesAutocomplete
-            selectProps={{
-              value: address,
-              onChange: (prediction: AutocompletePredictionSelect) => {
-                setGeoFromPrediction(prediction)
-              },
+          <PlacesAutocomplete
+            value={search}
+            onChange={value => {
+              setSearch(value)
             }}
-          />
+            onSelect={async (label: string, placeId: string) => {
+              setGeoFromPrediction({
+                label,
+                value: {
+                  description: label,
+                  place_id: placeId
+                }
+              })
+            }}
+          >
+            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+              <div>
+                <input
+                  {...getInputProps({
+                    placeholder: 'Search Places ...',
+                    className: 'location-search-input',
+                    style: {
+                      width: '100%'
+                    }
+                  })}
+                />
+                <div className="autocomplete-dropdown-container">
+                  {loading && <div>Loading...</div>}
+                  {suggestions.map(suggestion => {
+                    const className = suggestion.active
+                      ? 'suggestion-item--active'
+                      : 'suggestion-item';
+                    // inline style for demonstration purpose
+                    const style = suggestion.active
+                      ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                      : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                    return (
+                      <div
+                        {...getSuggestionItemProps(suggestion, {
+                          className,
+                          style,
+                        })}
+                      >
+                        <span>{suggestion.description}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </PlacesAutocomplete>
         )}
       </div>
       {isLoaded ? (
