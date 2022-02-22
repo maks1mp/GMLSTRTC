@@ -1,10 +1,8 @@
 {
   "name": "google-maps-location-search-tailwind-react-ts-component",
   "version": "0.1.0",
-  "homepage": "https://maks1mp.github.io/GMLSTRTC",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^6.4.3",
     "@react-google-maps/api": "^2.7.0",
     "@tailwindcss/forms": "^0.4.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -26,9 +24,9 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build"
   },
